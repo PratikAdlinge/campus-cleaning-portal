@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset System - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/dashboard}">Campus Cleaning - Admin</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/complaints}">Complaints</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/users}">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Reset System - Confirm Action</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <h5><i class="fas fa-warning"></i> Warning!</h5>
+                            <p>This action will <strong>permanently delete</strong> all data from the system. This cannot be undone.</p>
+                        </div>
+                        
+                        <h5 class="mt-4">Data that will be deleted:</h5>
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-exclamation-circle"></i> All Complaints</span>
+                                <span class="badge bg-primary rounded-pill" th:text="${totalComplaints}">0</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-exclamation-circle"></i> All Users (except admin)</span>
+                                <span class="badge bg-primary rounded-pill" th:text="${totalUsers}">0</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-exclamation-circle"></i> All Notifications</span>
+                                <span class="badge bg-primary rounded-pill">All</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-exclamation-circle"></i> All Uploaded Images</span>
+                                <span class="badge bg-primary rounded-pill">All</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> What will be kept:</h6>
+                            <ul class="mb-0">
+                                <li>Admin account (admin@college.com)</li>
+                                <li>Database tables and structure</li>
+                                <li>User roles (ADMIN, STAFF, STUDENT)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5 class="text-danger">Are you sure you want to delete all system data?</h5>
+                            <p class="text-muted">Please type <strong>RESET</strong> below to confirm:</p>
+                            
+                            <form th:action="@{/admin/reset-system}" method="post" id="resetForm">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="confirmText" 
+                                           placeholder="Type RESET to confirm" required>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-danger btn-lg" id="resetBtn" disabled>
+                                        <i class="fas fa-trash-alt"></i> Yes, Delete All Data
+                                    </button>
+                                    <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left"></i> Cancel - Go Back
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const confirmInput = document.getElementById('confirmText');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        confirmInput.addEventListener('input', function() {
+            if (this.value === 'RESET') {
+                resetBtn.disabled = false;
+                resetBtn.classList.remove('btn-danger');
+                resetBtn.classList.add('btn-success');
+            } else {
+                resetBtn.disabled = true;
+                resetBtn.classList.add('btn-danger');
+                resetBtn.classList.remove('btn-success');
+            }
+        });
+    </script>
+</body>
+</html>

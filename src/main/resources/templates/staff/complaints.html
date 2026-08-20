@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Complaints</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/dashboard}">
+                <i class="fas fa-leaf"></i> Campus Cleaning
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/staff/dashboard}"><i class="fas fa-home me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title"><i class="fas fa-tasks text-success"></i> My Tasks</h1>
+                    <p class="page-subtitle">View and manage your assigned tasks</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Location</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="complaint : ${complaints}">
+                                <td><strong>#<span th:text="${complaint.id}">1</span></strong></td>
+                                <td th:text="${complaint.title}">Title</td>
+                                <td th:text="${complaint.locationType}">CLASSROOM</td>
+                                <td>
+                                    <span class="priority-badge" th:classappend="'priority-' + ${complaint.priority}" th:text="${complaint.priority}">MEDIUM</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge" th:classappend="'status-' + ${complaint.status}" th:text="${complaint.status}">ASSIGNED</span>
+                                </td>
+                                <td th:text="${#temporals.format(complaint.createdAt, 'dd-MM-yyyy')}">Date</td>
+                                <td>
+                                    <a th:href="@{/staff/complaint/{id}(id=${complaint.id})}" class="btn btn-sm btn-success">View</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(complaints)}">
+                                <td colspan="7" class="text-center text-muted py-4">No tasks assigned</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

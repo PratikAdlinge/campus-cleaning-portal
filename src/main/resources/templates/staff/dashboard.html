@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/dashboard}">
+                <i class="fas fa-leaf"></i> Campus Cleaning
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/notifications}">
+                            <i class="fas fa-bell"></i> Notifications
+                            <span th:if="${unreadCount > 0}" class="notification-badge" th:text="${unreadCount}">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> <span th:text="${user.fullName}">Staff</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title"><i class="fas fa-user-tie"></i> Welcome, <span th:text="${user.fullName}">Staff</span>!</h1>
+            <p class="page-subtitle">Manage your cleaning tasks</p>
+        </div>
+        
+        <!-- Stats -->
+        <div class="row mb-4">
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h2 th:text="${assignedComplaints.size()}">0</h2>
+                    <p>Assigned Tasks</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon yellow">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <h2 class="text-warning" th:text="${inProgressComplaints.size()}">0</h2>
+                    <p>In Progress</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon green-dark">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2 class="text-success" th:text="${completedCount}">0</h2>
+                    <p>Completed</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Tasks -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-clock"></i> Pending Tasks</h5>
+                        <a th:href="@{/staff/complaints}" class="btn btn-sm btn-outline-success">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Location</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="complaint : ${assignedComplaints}">
+                                        <td><strong>#<span th:text="${complaint.id}">1</span></strong></td>
+                                        <td th:text="${complaint.title}">Title</td>
+                                        <td th:text="${complaint.locationType}">CLASSROOM</td>
+                                        <td>
+                                            <span class="priority-badge" 
+                                                  th:classappend="'priority-' + ${complaint.priority}"
+                                                  th:text="${complaint.priority}">MEDIUM</span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" 
+                                                  th:classappend="'status-' + ${complaint.status}"
+                                                  th:text="${complaint.status}">ASSIGNED</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(complaint.createdAt, 'dd-MM-yyyy')}">Date</td>
+                                        <td>
+                                            <a th:href="@{/staff/complaint/{id}(id=${complaint.id})}" 
+                                               class="btn btn-sm btn-success">View</a>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(assignedComplaints)}">
+                                        <td colspan="7" class="text-center text-muted py-4">No pending tasks</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

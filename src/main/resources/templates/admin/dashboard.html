@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/dashboard}">
+                <i class="fas fa-leaf"></i> Campus Cleaning
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/users}"><i class="fas fa-users me-1"></i> Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/complaints}"><i class="fas fa-list me-1"></i> Complaints</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/reports}"><i class="fas fa-chart-bar me-1"></i> Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h1 class="page-title"><i class="fas fa-cog"></i> Admin Dashboard</h1>
+                    <p class="page-subtitle">Overview of the Campus Cleaning Management System</p>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${param.reset == 'success'}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <strong>Success!</strong> System has been reset successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h2 th:text="${totalComplaints}">0</h2>
+                    <p>Total Complaints</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon yellow">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h2 class="text-warning" th:text="${pendingComplaints}">0</h2>
+                    <p>Pending</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon green-dark">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2 class="text-success" th:text="${completedComplaints}">0</h2>
+                    <p>Completed</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h2 class="text-info" th:text="${verifiedComplaints}">0</h2>
+                    <p>Verified</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-users"></i> Users</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span><i class="fas fa-user-graduate text-info me-2"></i> Students</span>
+                            <strong class="h4 mb-0 text-success" th:text="${studentCount}">0</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user-tie text-success me-2"></i> Staff</span>
+                            <strong class="h4 mb-0 text-success" th:text="${staffCount}">0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-line"></i> Performance</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="mb-2 text-muted">Average Resolution Time</p>
+                        <h2 class="text-success"><span th:text="${#numbers.formatDecimal(avgResolutionTime, 1, 1)}">0</span> min</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Staff -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-trophy"></i> Top Performing Staff</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="staff, iter : ${topStaff}">
+                                        <td>
+                                            <span th:if="${iter.index == 0}" class="badge bg-warning text-dark"><i class="fas fa-medal me-1"></i>1st</span>
+                                            <span th:if="${iter.index == 1}" class="badge bg-secondary"><i class="fas fa-medal me-1"></i>2nd</span>
+                                            <span th:if="${iter.index == 2}" class="badge" style="background: #cd7f32;"><i class="fas fa-medal me-1"></i>3rd</span>
+                                            <span th:if="${iter.index > 2}" class="badge bg-light text-dark" th:text="${iter.index + 1}">4</span>
+                                        </td>
+                                        <td th:text="${staff.fullName}">Name</td>
+                                        <td th:text="${staff.email}">email</td>
+                                        <td><strong class="text-success" th:text="${staff.points}">0</strong></td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(topStaff)}">
+                                        <td colspan="4" class="text-center text-muted py-4">No staff yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Complaints -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Recent Complaints</h5>
+                        <a th:href="@{/admin/complaints}" class="btn btn-sm btn-outline-success">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Location</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="complaint : ${recentComplaints}">
+                                        <td><strong>#<span th:text="${complaint.id}">1</span></strong></td>
+                                        <td th:text="${complaint.title}">Title</td>
+                                        <td th:text="${complaint.locationType}">CLASSROOM</td>
+                                        <td>
+                                            <span class="priority-badge" th:classappend="'priority-' + ${complaint.priority}" th:text="${complaint.priority}">MEDIUM</span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" th:classappend="'status-' + ${complaint.status}" th:text="${complaint.status}">PENDING</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(complaint.createdAt, 'dd-MM-yyyy')}">Date</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Reset Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5><i class="fas fa-exclamation-triangle"></i> System Administration</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <h6 class="mb-1">Reset System Data</h6>
+                                <p class="text-muted mb-0">Delete all complaints, users (except admin), notifications, and uploaded images.</p>
+                            </div>
+                            <a th:href="@{/admin/reset-confirm}" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> Clear All Data
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

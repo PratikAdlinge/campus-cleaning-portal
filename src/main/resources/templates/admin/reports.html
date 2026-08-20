@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/dashboard}">
+                <i class="fas fa-leaf"></i> Campus Cleaning
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/dashboard}"><i class="fas fa-home me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/users}"><i class="fas fa-users me-1"></i> Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/complaints}"><i class="fas fa-list me-1"></i> Complaints</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title"><i class="fas fa-chart-bar text-success"></i> Reports & Analytics</h1>
+                    <p class="page-subtitle">View system performance and statistics</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h2 th:text="${totalComplaints}">0</h2>
+                    <p>Total Complaints</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h2 class="text-warning" th:text="${pending}">0</h2>
+                    <p>Pending</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2 class="text-success" th:text="${completed}">0</h2>
+                    <p>Completed</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-stopwatch"></i>
+                    </div>
+                    <h2 class="text-info"><span th:text="${#numbers.formatDecimal(avgTime, 1, 0)}">0</span>m</h2>
+                    <p>Avg Resolution</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Breakdown -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-pie"></i> Complaint Status Breakdown</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress mb-3" style="height: 35px; border-radius: 10px; overflow: hidden;">
+                            <div class="progress-bar bg-warning" role="progressbar" th:style="'width:' + (${totalComplaints} > 0 ? ${pending} * 100 / ${totalComplaints} : 0) + '%'" th:text="${pending} + ' Pending'">Pending</div>
+                            <div class="progress-bar bg-info" role="progressbar" th:style="'width:' + (${totalComplaints} > 0 ? ${assigned} * 100 / ${totalComplaints} : 0) + '%'" th:text="${assigned} + ' Assigned'">Assigned</div>
+                            <div class="progress-bar" style="background: #f59e0b;" role="progressbar" th:style="'width:' + (${totalComplaints} > 0 ? ${inProgress} * 100 / ${totalComplaints} : 0) + '%'" th:text="${inProgress} + ' In Progress'">In Progress</div>
+                            <div class="progress-bar bg-success" role="progressbar" th:style="'width:' + (${totalComplaints} > 0 ? ${cleaned} * 100 / ${totalComplaints} : 0) + '%'" th:text="${cleaned} + ' Cleaned'">Cleaned</div>
+                            <div class="progress-bar bg-dark" role="progressbar" th:style="'width:' + (${totalComplaints} > 0 ? ${verified} * 100 / ${totalComplaints} : 0) + '%'" th:text="${verified} + ' Verified'">Verified</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Staff Performance -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-trophy"></i> Staff Performance Ranking</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Staff Name</th>
+                                        <th>Email</th>
+                                        <th>Completed Tasks</th>
+                                        <th>Points Earned</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="staff, iter : ${topStaff}">
+                                        <td>
+                                            <span th:if="${iter.index == 0}" class="badge bg-warning text-dark"><i class="fas fa-trophy"></i> 1st</span>
+                                            <span th:if="${iter.index == 1}" class="badge bg-secondary"><i class="fas fa-medal"></i> 2nd</span>
+                                            <span th:if="${iter.index == 2}" class="badge" style="background: #cd7f32;"><i class="fas fa-medal"></i> 3rd</span>
+                                            <span th:if="${iter.index > 2}" class="badge bg-light text-dark" th:text="${iter.index + 1}">4</span>
+                                        </td>
+                                        <td th:text="${staff.fullName}">Name</td>
+                                        <td th:text="${staff.email}">email</td>
+                                        <td th:text="${staff.points / 10}">0</td>
+                                        <td><strong class="text-success" th:text="${staff.points}">0</strong></td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(topStaff)}">
+                                        <td colspan="5" class="text-center text-muted py-4">No staff data yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

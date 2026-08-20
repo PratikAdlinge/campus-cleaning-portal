@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Complaints</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/dashboard}">
+                <i class="fas fa-leaf"></i> Campus Cleaning
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/student/dashboard}"><i class="fas fa-home me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h1 class="page-title"><i class="fas fa-list"></i> My Complaints</h1>
+                    <p class="page-subtitle">Track your reported issues</p>
+                </div>
+                <a th:href="@{/student/complaint/new}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> New Complaint
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Location</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Rating</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="complaint : ${complaints}">
+                                <td><strong>#<span th:text="${complaint.id}">1</span></strong></td>
+                                <td th:text="${complaint.title}">Title</td>
+                                <td>
+                                    <span th:text="${complaint.locationType}">CLASSROOM</span>
+                                    <small class="d-block text-muted" th:text="${complaint.specificLocation}">Location</small>
+                                </td>
+                                <td>
+                                    <span class="priority-badge" 
+                                          th:classappend="'priority-' + ${complaint.priority}"
+                                          th:text="${complaint.priority}">MEDIUM</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge" 
+                                          th:classappend="'status-' + ${complaint.status}"
+                                          th:text="${complaint.status}">PENDING</span>
+                                </td>
+                                <td>
+                                    <span th:if="${complaint.rating != null}">
+                                        <i class="fas fa-star text-warning" th:each="i : ${#numbers.sequence(1, complaint.rating)}"></i>
+                                    </span>
+                                    <span th:if="${complaint.rating == null}" class="text-muted">-</span>
+                                </td>
+                                <td th:text="${#temporals.format(complaint.createdAt, 'dd-MM-yyyy')}">Date</td>
+                                <td>
+                                    <a th:href="@{/student/complaint/{id}(id=${complaint.id})}" 
+                                       class="btn btn-sm btn-outline-success">View</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(complaints)}">
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                    <p class="mb-3">No complaints yet</p>
+                                    <a th:href="@{/student/complaint/new}" class="btn btn-success">Report First Complaint</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <nav th:if="${totalPages > 1}" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/student/complaints(page=${currentPage - 1})}">Previous</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                            th:classappend="${currentPage == i} ? 'active'">
+                            <a class="page-link" th:href="@{/student/complaints(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/student/complaints(page=${currentPage + 1})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

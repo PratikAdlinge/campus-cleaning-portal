@@ -1,0 +1,25 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Eclipse
+.settings/
+.classpath
+.project
+
+# VS Code
+.vscode/
+
+# Maven build files
+target/
+
+# Compiled files
+bin/
+*.class
+
+# Local application configuration
+application.properties
+
+# Operating system files
+.DS_Store
+Thumbs.db
